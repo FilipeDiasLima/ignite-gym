@@ -5,8 +5,11 @@ import BackgroundImg from "@assets/background.png";
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
+import { useForm, Controller } from "react-hook-form";
 
 export function SignIn() {
+  const { control } = useForm();
+
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
 
   function handleNewAccount() {
@@ -38,12 +41,32 @@ export function SignIn() {
             Acesse sua conta
           </Heading>
 
-          <Input
-            placeholder="E-mail"
-            keyboardType="email-address"
-            autoCapitalize="none"
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { value, onChange } }) => (
+              <Input
+                placeholder="E-mail"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                value={value}
+                onChange={onChange}
+              />
+            )}
           />
-          <Input placeholder="Senha" secureTextEntry />
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { value, onChange } }) => (
+              <Input
+                placeholder="Senha"
+                secureTextEntry
+                value={value}
+                onChange={onChange}
+              />
+            )}
+          />
+
           <Button title="Acessar" />
         </Center>
 
