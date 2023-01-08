@@ -3,6 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "baseUrl": "./",
+    "declaration": true,
     "paths": {
       "@dtos/*": ["src/dtos/*"],
       "@assets/*": ["./src/assets/*"],
