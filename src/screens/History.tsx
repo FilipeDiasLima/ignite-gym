@@ -1,19 +1,40 @@
-import { useState } from "react";
-import { Heading, VStack, SectionList, Text } from "native-base";
 import { HistoryCard } from "@components/HistoryCard";
 import { ScreenHeader } from "@components/ScreenHeader";
+import { HistoryByDayDTO } from "@dtos/HistoryByDay";
+import { api } from "@services/api";
+import { AppError } from "@utils/AppError";
+import { Heading, SectionList, Text, useToast, VStack } from "native-base";
+import { useEffect, useState } from "react";
 
 export function History() {
-  const [exercises, setExercises] = useState([
-    {
-      title: "26.06.22",
-      data: ["Puxada alta", "Remada sentada"],
-    },
-    {
-      title: "28.06.22",
-      data: ["Puxada alta", "Remada sentada"],
-    },
-  ]);
+  const toast = useToast();
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [exercises, setExercises] = useState<HistoryByDayDTO[]>([]);
+
+  async function fetchHistory() {
+    try {
+      setIsLoading(true);
+      const { data } = await api.get(`/history`);
+      setExercises(data);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível carregar o histórico";
+      toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.500",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchHistory();
+  }, []);
 
   return (
     <VStack flex={1}>
@@ -22,8 +43,8 @@ export function History() {
       <SectionList
         sections={exercises}
         px={8}
-        keyExtractor={(item) => item}
-        renderItem={({ item }) => <HistoryCard />}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <HistoryCard data={item} />}
         renderSectionHeader={({ section }) => (
           <Heading
             color="gray.200"

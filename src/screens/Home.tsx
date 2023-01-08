@@ -15,14 +15,13 @@ export function Home() {
   const toast = useToast();
   const [groups, setGroups] = useState<string[]>([]);
   const [exercises, setExercises] = useState<ExerciseDTO[]>([]);
-  const [groupSelected, setGroupSelected] = useState("costas");
+  const [groupSelected, setGroupSelected] = useState("antebraço");
   const [isLoading, setIsLoading] = useState(true);
 
   async function fetchExercisesByGroup() {
     try {
       setIsLoading(true);
       const response = await api.get(`/exercises/bygroup/${groupSelected}`);
-      console.log("🚀 ~ file: Home.tsx:26 ~ fetchGroups ~ response", response);
       setExercises(response.data);
     } catch (error) {
       const isAppError = error instanceof AppError;
@@ -56,8 +55,8 @@ export function Home() {
     }
   }
 
-  function handleOpenExerciseDetails() {
-    navigation.navigate("exercise");
+  function handleOpenExerciseDetails(exerciseId: string) {
+    navigation.navigate("exercise", { exerciseId });
   }
 
   useEffect(() => {
@@ -111,7 +110,10 @@ export function Home() {
             _contentContainerStyle={{ paddingBottom: 20 }}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <ExerciseCard data={item} onPress={handleOpenExerciseDetails} />
+              <ExerciseCard
+                data={item}
+                onPress={() => handleOpenExerciseDetails(item.id)}
+              />
             )}
           />
         </VStack>

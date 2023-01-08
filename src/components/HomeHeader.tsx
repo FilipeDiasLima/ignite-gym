@@ -5,6 +5,7 @@ import { TouchableOpacity } from "react-native";
 import { useAuth } from "@hooks/useAuth";
 import defaultAvatar from "@assets/userPhotoDefault.png";
 import { UserPhoto } from "./UserPhoto";
+import { api } from "@services/api";
 
 export function HomeHeader() {
   const { user, signOut } = useAuth();
@@ -15,7 +16,7 @@ export function HomeHeader() {
         size={16}
         source={
           user.avatar
-            ? { uri: "https://github.com/filipediaslima.png" }
+            ? { uri: `${api.defaults.baseURL}/avatar/${user.avatar}` }
             : defaultAvatar
         }
         alt="Avatar"
