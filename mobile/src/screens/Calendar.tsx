@@ -1,19 +1,27 @@
 import { DayCard } from "@components/DayCard";
 import { HomeHeader } from "@components/HomeHeader";
+import { useNavigation } from "@react-navigation/native";
+import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { Center, FlatList, Text, VStack } from "native-base";
 
 export function Calendar() {
+  const navigation = useNavigation<AppNavigatorRoutesProps>();
+
   const days = [
     "Segunda-feira",
     "Terça-feira",
     "Quarta-feira",
     "Quinta-feira",
     "Sexta-feira",
-    "Sábado-feira",
-    "Domingo-feira",
+    "Sábado",
+    "Domingo",
   ];
 
   const groups = ["Costas", "Bíceps", "Antebraço"];
+
+  function handleOpenDay(day: string) {
+    navigation.navigate("dayCalendar", { day });
+  }
 
   return (
     <VStack flex={1}>
@@ -32,7 +40,13 @@ export function Calendar() {
         showsVerticalScrollIndicator={false}
         _contentContainerStyle={{ paddingBottom: 20 }}
         keyExtractor={(item) => item}
-        renderItem={({ item }) => <DayCard nameDay={item} groups={groups} />}
+        renderItem={({ item }) => (
+          <DayCard
+            onPress={() => handleOpenDay(item)}
+            nameDay={item}
+            groups={groups}
+          />
+        )}
       />
     </VStack>
   );

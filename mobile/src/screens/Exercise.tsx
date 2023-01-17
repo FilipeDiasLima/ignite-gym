@@ -1,4 +1,3 @@
-import { Feather } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import {
@@ -23,6 +22,7 @@ import { ExerciseDTO } from "@dtos/ExerciseDTO";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
 import { useEffect, useState } from "react";
+import { GoBackHeader } from "@components/GoBackHeader";
 
 type RouteParams = {
   exerciseId: string;
@@ -40,10 +40,6 @@ export function Exercise() {
   const toast = useToast();
 
   const { exerciseId } = route.params as RouteParams;
-
-  function handleGoBack() {
-    navigation.goBack();
-  }
 
   async function fetchExerciseDetails() {
     try {
@@ -98,40 +94,11 @@ export function Exercise() {
 
   return (
     <VStack flex={1}>
-      <VStack px={8} bg="gray.600" pt={12}>
-        <TouchableOpacity onPress={handleGoBack}>
-          <Icon as={Feather} name="arrow-left" color="green.500" size={6} />
-        </TouchableOpacity>
-
-        <HStack
-          justifyContent="space-between"
-          mt={4}
-          mb={8}
-          alignItems="center"
-        >
-          <Heading
-            color="gray.100"
-            fontSize="lg"
-            flexShrink={1}
-            fontFamily="heading"
-          >
-            {exerciseData.name}
-          </Heading>
-
-          <HStack alignItems="center">
-            <BodySvg />
-            <Text
-              color="gray.200"
-              ml={1}
-              fontSize="lg"
-              textTransform="capitalize"
-            >
-              {exerciseData.group}
-            </Text>
-          </HStack>
-        </HStack>
-      </VStack>
-
+      <GoBackHeader
+        title={exerciseData.name}
+        subtitle={exerciseData.group}
+        subtitleSvg={<BodySvg />}
+      />
       {isLoading ? (
         <Loading />
       ) : (

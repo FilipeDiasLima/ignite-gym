@@ -1,5 +1,6 @@
 import { ExerciseCard } from "@components/ExerciseCard";
 import { Group } from "@components/Group";
+import { GroupsHorizontalList } from "@components/GroupsHorizontalList";
 import { HomeHeader } from "@components/HomeHeader";
 import { Loading } from "@components/Loading";
 import { ExerciseDTO } from "@dtos/ExerciseDTO";
@@ -13,8 +14,8 @@ import { useCallback, useEffect, useState } from "react";
 export function Home() {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const toast = useToast();
-  const [groups, setGroups] = useState<string[]>([]);
   const [exercises, setExercises] = useState<ExerciseDTO[]>([]);
+  const [toastGroup, setToastGroups] = useState<string>("");
   const [groupSelected, setGroupSelected] = useState("antebraço");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -38,30 +39,18 @@ export function Home() {
     }
   }
 
-  async function fetchGroups() {
-    try {
-      const response = await api.get("/groups");
-      setGroups(response.data);
-    } catch (error) {
-      const isAppError = error instanceof AppError;
-      const title = isAppError
-        ? error.message
-        : "Não foi possível carregar os grupos musculares";
-      toast.show({
-        title,
-        placement: "top",
-        bgColor: "red.500",
-      });
-    }
-  }
-
   function handleOpenExerciseDetails(exerciseId: string) {
     navigation.navigate("exercise", { exerciseId });
   }
 
   useEffect(() => {
-    fetchGroups();
-  }, []);
+    if (toastGroup)
+      toast.show({
+        title: toastGroup,
+        placement: "top",
+        bgColor: "red.500",
+      });
+  }, [toastGroup]);
 
   useFocusEffect(
     useCallback(() => {
@@ -73,22 +62,10 @@ export function Home() {
     <VStack flex={1}>
       <HomeHeader />
 
-      <FlatList
-        data={groups}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        _contentContainerStyle={{ px: 8 }}
-        my={10}
-        maxH={10}
-        minH={10}
-        keyExtractor={(item) => item}
-        renderItem={({ item }) => (
-          <Group
-            name={item}
-            onPress={() => setGroupSelected(item)}
-            isActive={groupSelected.toLowerCase() === item.toLowerCase()}
-          />
-        )}
+      <GroupsHorizontalList
+        groupSelected={groupSelected}
+        setGroupSelected={(group) => setGroupSelected(group)}
+        toastResponse={(title) => setToastGroups(title)}
       />
 
       {isLoading ? (

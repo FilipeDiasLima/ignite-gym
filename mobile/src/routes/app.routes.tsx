@@ -16,11 +16,13 @@ import { Calendar } from "@screens/Calendar";
 import HomeSvg from "@assets/home.svg";
 import HistorySvg from "@assets/history.svg";
 import ProfileSvg from "@assets/profile.svg";
+import DayCalendar from "@screens/DayCalendar";
 
 type AppRoutes = {
   home: undefined;
   calendar: undefined;
   exercise: { exerciseId: string };
+  dayCalendar: { day: string };
   history: undefined;
   profile: undefined;
 };
@@ -36,6 +38,7 @@ export function AppRoutes() {
 
   return (
     <Navigator
+      backBehavior="history"
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
@@ -89,6 +92,11 @@ export function AppRoutes() {
       <Screen
         name="exercise"
         component={Exercise}
+        options={{ tabBarButton: () => null }}
+      />
+      <Screen
+        name="dayCalendar"
+        component={DayCalendar}
         options={{ tabBarButton: () => null }}
       />
     </Navigator>
