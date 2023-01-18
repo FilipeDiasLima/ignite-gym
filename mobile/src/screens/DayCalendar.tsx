@@ -1,9 +1,13 @@
+import { ExerciseAccordion } from "@components/ExerciseAccordion";
 import { GoBackHeader } from "@components/GoBackHeader";
 import { GroupsHorizontalList } from "@components/GroupsHorizontalList";
 import { Loading } from "@components/Loading";
-import { useRoute } from "@react-navigation/native";
-import { Heading, HStack, Text, useToast, VStack } from "native-base";
-import { useEffect, useState } from "react";
+import { ExerciseDTO } from "@dtos/ExerciseDTO";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
+import { api } from "@services/api";
+import { AppError } from "@utils/AppError";
+import { FlatList, Heading, HStack, Text, useToast, VStack } from "native-base";
+import { useCallback, useEffect, useState } from "react";
 
 type RouteParams = {
   day: string;
@@ -13,6 +17,7 @@ export default function DayCalendar() {
   const route = useRoute();
   const toast = useToast();
 
+  const [exercises, setExercises] = useState<ExerciseDTO[]>([]);
   const [toastGroup, setToastGroups] = useState<string>("");
   const [groupSelected, setGroupSelected] = useState("antebraço");
 
@@ -21,6 +26,32 @@ export default function DayCalendar() {
   const [isLoading, setIsLoading] = useState(false);
 
   const { day } = route.params as RouteParams;
+
+  async function fetchExercisesByGroup() {
+    try {
+      setIsLoading(true);
+      const { data } = await api.get(`/exercises/bygroup/${groupSelected}`);
+      setExercises(data);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível carregar os exercícios";
+      toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.500",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchExercisesByGroup();
+    }, [groupSelected])
+  );
 
   useEffect(() => {
     if (toastGroup)
@@ -50,14 +81,27 @@ export default function DayCalendar() {
       {isLoading ? (
         <Loading />
       ) : (
-        <HStack justifyContent="space-between" px={8}>
-          <Heading color="gray.200" fontSize="md" fontFamily="heading">
-            Exercícios selecionados
-          </Heading>
-          <Text color="gray.200" fontSize="sm">
-            2
-          </Text>
-        </HStack>
+        <>
+          <HStack justifyContent="space-between" px={8} mb={5}>
+            <Heading color="gray.200" fontSize="md" fontFamily="heading">
+              Exercícios selecionados
+            </Heading>
+            <Text color="gray.200" fontSize="sm">
+              2
+            </Text>
+          </HStack>
+
+          <FlatList
+            data={exercises}
+            showsVerticalScrollIndicator={false}
+            px={8}
+            _contentContainerStyle={{
+              paddingBottom: 20,
+            }}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => <ExerciseAccordion data={item} />}
+          />
+        </>
       )}
     </VStack>
   );
