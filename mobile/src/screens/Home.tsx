@@ -8,8 +8,19 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
-import { FlatList, Heading, HStack, Text, useToast, VStack } from "native-base";
+import {
+  Center,
+  FlatList,
+  Heading,
+  HStack,
+  Text,
+  useToast,
+  VStack,
+} from "native-base";
 import { useCallback, useEffect, useState } from "react";
+import { calendar } from "@utils/calendar";
+import ArrowDownSvg from "@assets/arrow-down-draw.svg";
+import { View } from "react-native";
 
 export function Home() {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
@@ -23,6 +34,7 @@ export function Home() {
     try {
       setIsLoading(true);
       const response = await api.get(`/exercises/bygroup/${groupSelected}`);
+      console.log(response.data);
       setExercises(response.data);
     } catch (error) {
       const isAppError = error instanceof AppError;
@@ -44,6 +56,10 @@ export function Home() {
   }
 
   useEffect(() => {
+    setExercises(calendar.calendar.seg.exercices);
+  }, []);
+
+  useEffect(() => {
     if (toastGroup)
       toast.show({
         title: toastGroup,
@@ -62,38 +78,58 @@ export function Home() {
     <VStack flex={1}>
       <HomeHeader />
 
-      <GroupsHorizontalList
-        groupSelected={groupSelected}
-        setGroupSelected={(group) => setGroupSelected(group)}
-        toastResponse={(title) => setToastGroups(title)}
-      />
-
-      {isLoading ? (
-        <Loading />
-      ) : (
-        <VStack flex={1} px={8}>
-          <HStack justifyContent="space-between" mb={5}>
-            <Heading color="gray.200" fontSize="md" fontFamily="heading">
-              Exercícios
-            </Heading>
-            <Text color="gray.200" fontSize="sm">
-              {exercises.length}
-            </Text>
-          </HStack>
-
-          <FlatList
-            data={exercises}
-            showsVerticalScrollIndicator={false}
-            _contentContainerStyle={{ paddingBottom: 20 }}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <ExerciseCard
-                data={item}
-                onPress={() => handleOpenExerciseDetails(item.id)}
-              />
-            )}
+      {exercises ? (
+        <>
+          <GroupsHorizontalList
+            groupSelected={groupSelected}
+            setGroupSelected={(group) => setGroupSelected(group)}
+            toastResponse={(title) => setToastGroups(title)}
           />
-        </VStack>
+
+          {isLoading ? (
+            <Loading />
+          ) : (
+            <VStack flex={1} px={8}>
+              <HStack justifyContent="space-between" mb={5}>
+                <Heading color="gray.200" fontSize="md" fontFamily="heading">
+                  Exercícios
+                </Heading>
+                <Text color="gray.200" fontSize="sm">
+                  {exercises.length}
+                </Text>
+              </HStack>
+
+              <FlatList
+                data={exercises}
+                showsVerticalScrollIndicator={false}
+                _contentContainerStyle={{ paddingBottom: 20 }}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <ExerciseCard
+                    data={item}
+                    onPress={() => handleOpenExerciseDetails(item.id)}
+                  />
+                )}
+              />
+            </VStack>
+          )}
+        </>
+      ) : (
+        <>
+          <Center flex={1} px={10}>
+            <Text textAlign="center" color="gray.200" fontSize="lg">
+              Você ainda não possui um treino,{" "}
+              <Text color="green.500" fontSize="lg">
+                acesse a agenda
+              </Text>{" "}
+              patra criar seu treino
+            </Text>
+          </Center>
+          <ArrowDownSvg
+            width={200}
+            style={{ position: "absolute", bottom: -30, left: 60 }}
+          />
+        </>
       )}
     </VStack>
   );

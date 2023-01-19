@@ -10,6 +10,7 @@ import {
   View,
   VStack,
   Switch,
+  Input,
 } from "native-base";
 import { useState } from "react";
 import { Button } from "./Button";
@@ -24,15 +25,7 @@ export function ExerciseAccordion({ data }: Props) {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isToFailureSeries, setIsToFailureSeries] = useState(false);
-  console.log(
-    "🚀 ~ file: ExerciseAccordion.tsx:27 ~ ExerciseAccordion ~ isToFailureSeries",
-    isToFailureSeries
-  );
   const [isToFailureRepetitions, setIsToFailureRepetitions] = useState(false);
-  console.log(
-    "🚀 ~ file: ExerciseAccordion.tsx:29 ~ ExerciseAccordion ~ isToFailureRepetitions",
-    isToFailureRepetitions
-  );
 
   function handleAccordion() {
     setIsOpen(!isOpen);
@@ -91,12 +84,22 @@ export function ExerciseAccordion({ data }: Props) {
               w={173}
               justifyContent="space-between"
             >
-              <Text color="gray.200">Séries</Text>
+              <Text color={isToFailureSeries ? "red.500" : "gray.200"} w="55%">
+                Séries
+              </Text>
               <Divider orientation="vertical" mx={4} bg="white" />
-              <Text color="gray.200">3</Text>
+              <Input
+                color={isToFailureSeries ? "red.500" : "gray.200"}
+                isDisabled={isToFailureSeries}
+                variant="unstyled"
+                keyboardType="numeric"
+                placeholder={isToFailureSeries ? "--" : "0"}
+              />
             </Box>
             <HStack alignItems="center" space={2}>
-              <Text color="gray.200">Até a falha</Text>
+              <Text color={isToFailureSeries ? "red.500" : "gray.200"}>
+                Até a falha
+              </Text>
               <Switch
                 value={isToFailureSeries}
                 size="sm"
@@ -117,13 +120,25 @@ export function ExerciseAccordion({ data }: Props) {
               w={173}
               justifyContent="space-between"
             >
-              <Text color="gray.200">Repetições</Text>
+              <Text
+                color={isToFailureRepetitions ? "red.500" : "gray.200"}
+                w="55%"
+              >
+                Repetições
+              </Text>
               <Divider orientation="vertical" mx={4} bg="white" />
-              <Text color="gray.200">14</Text>
+              <Input
+                color={isToFailureRepetitions ? "red.500" : "gray.200"}
+                isDisabled={isToFailureRepetitions}
+                variant="unstyled"
+                keyboardType="numeric"
+                placeholder={isToFailureRepetitions ? "--" : "0"}
+              />
             </Box>
             <HStack alignItems="center" space={2}>
-              <Text color="gray.200">Até a falha</Text>
-
+              <Text color={isToFailureRepetitions ? "red.500" : "gray.200"}>
+                Até a falha
+              </Text>
               <Switch
                 value={isToFailureRepetitions}
                 size="sm"
