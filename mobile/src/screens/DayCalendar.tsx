@@ -18,14 +18,30 @@ export default function DayCalendar() {
   const toast = useToast();
 
   const [exercises, setExercises] = useState<ExerciseDTO[]>([]);
-  const [toastGroup, setToastGroups] = useState<string>("");
   const [groupSelected, setGroupSelected] = useState("antebraço");
-
-  const groups = ["Costas", "Bíceps", "Antebraço"];
+  const [groups, setGroups] = useState<string[]>([]);
+  const groupsSelected = ["Costas", "Bíceps", "Antebraço"];
 
   const [isLoading, setIsLoading] = useState(false);
 
   const { day } = route.params as RouteParams;
+
+  async function fetchGroups() {
+    try {
+      const response = await api.get("/groups");
+      setGroups(response.data);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível carregar os grupos musculares";
+      toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.500",
+      });
+    }
+  }
 
   async function fetchExercisesByGroup() {
     try {
@@ -47,35 +63,31 @@ export default function DayCalendar() {
     }
   }
 
+  useEffect(() => {
+    fetchGroups();
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
       fetchExercisesByGroup();
     }, [groupSelected])
   );
 
-  useEffect(() => {
-    if (toastGroup)
-      toast.show({
-        title: toastGroup,
-        placement: "top",
-        bgColor: "red.500",
-      });
-  }, [toastGroup]);
-
   return (
     <VStack flex={1}>
       <GoBackHeader title={`Treino de `} titleSec={day} />
 
       <Text mt={5} mb={-5} px={8} color="gray.200" fontSize="md">
-        {groups.map(
-          (group, index) => group + (index === groups.length - 1 ? "" : " - ")
+        {groupsSelected.map(
+          (group, index) =>
+            group + (index === groupsSelected.length - 1 ? "" : " - ")
         )}
       </Text>
 
       <GroupsHorizontalList
         groupSelected={groupSelected}
         setGroupSelected={(group) => setGroupSelected(group)}
-        toastResponse={(title) => setToastGroups(title)}
+        groups={groups}
       />
 
       {isLoading ? (

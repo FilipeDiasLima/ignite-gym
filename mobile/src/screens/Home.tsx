@@ -1,13 +1,15 @@
+import ArrowDownSvg from "@assets/arrow-down-draw.svg";
 import { ExerciseCard } from "@components/ExerciseCard";
-import { Group } from "@components/Group";
 import { GroupsHorizontalList } from "@components/GroupsHorizontalList";
 import { HomeHeader } from "@components/HomeHeader";
 import { Loading } from "@components/Loading";
 import { ExerciseDTO } from "@dtos/ExerciseDTO";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
+import { calendar } from "@utils/calendar";
+import { getDayName } from "@utils/getDayName";
 import {
   Center,
   FlatList,
@@ -18,23 +20,39 @@ import {
   VStack,
 } from "native-base";
 import { useCallback, useEffect, useState } from "react";
-import { calendar } from "@utils/calendar";
-import ArrowDownSvg from "@assets/arrow-down-draw.svg";
-import { View } from "react-native";
 
 export function Home() {
-  const navigation = useNavigation<AppNavigatorRoutesProps>();
   const toast = useToast();
+  const day = getDayName();
+  const navigation = useNavigation<AppNavigatorRoutesProps>();
+
+  const [groups, setGroups] = useState<string[]>([]);
   const [exercises, setExercises] = useState<ExerciseDTO[]>([]);
-  const [toastGroup, setToastGroups] = useState<string>("");
   const [groupSelected, setGroupSelected] = useState("antebraço");
   const [isLoading, setIsLoading] = useState(true);
+
+  async function fetchGroups() {
+    try {
+      const response = await api.get("/groups");
+      // setGroups(response.data);
+      setGroups(["costas", "bíceps", "antebraço"]);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível carregar os grupos musculares";
+      toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.500",
+      });
+    }
+  }
 
   async function fetchExercisesByGroup() {
     try {
       setIsLoading(true);
       const response = await api.get(`/exercises/bygroup/${groupSelected}`);
-      console.log(response.data);
       setExercises(response.data);
     } catch (error) {
       const isAppError = error instanceof AppError;
@@ -56,17 +74,9 @@ export function Home() {
   }
 
   useEffect(() => {
+    fetchGroups();
     setExercises(calendar.calendar.seg.exercices);
   }, []);
-
-  useEffect(() => {
-    if (toastGroup)
-      toast.show({
-        title: toastGroup,
-        placement: "top",
-        bgColor: "red.500",
-      });
-  }, [toastGroup]);
 
   useFocusEffect(
     useCallback(() => {
@@ -78,12 +88,32 @@ export function Home() {
     <VStack flex={1}>
       <HomeHeader />
 
+      <HStack
+        my={7}
+        mb={-5}
+        px={8}
+        alignItems="center"
+        justifyContent="space-between"
+      >
+        <Heading
+          textTransform="uppercase"
+          color="green.500"
+          fontSize="md"
+          fontFamily="heading"
+        >
+          {day}
+        </Heading>
+        <Text color="gray.200" fontSize="md" fontFamily="heading">
+          Treino de hoje
+        </Text>
+      </HStack>
+
       {exercises ? (
         <>
           <GroupsHorizontalList
             groupSelected={groupSelected}
             setGroupSelected={(group) => setGroupSelected(group)}
-            toastResponse={(title) => setToastGroups(title)}
+            groups={groups}
           />
 
           {isLoading ? (
