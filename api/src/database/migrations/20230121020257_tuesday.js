@@ -1,4 +1,4 @@
-exports.up = knex => knex.schema.createTable("sunday", table => {
+exports.up = knex => knex.schema.createTable("tuesday", table => {
   table.increments("id");
 
   table.integer("user_id").references("id").inTable("users");
@@ -10,4 +10,4 @@ exports.up = knex => knex.schema.createTable("sunday", table => {
   table.timestamp("updated_at").default(knex.fn.now());
 });
 
-exports.down = knex => knex.schema.dropTable("sunday");
+exports.down = knex => knex.schema.dropTable("tuesday");

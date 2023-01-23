@@ -1,6 +1,7 @@
 exports.up = knex => knex.schema.createTable("history", table => {
   table.increments("id");
 
+  table.text("date").notNullable();
   table.integer("user_id").references("id").inTable("users");
   table.integer("exercise_id").references("id").inTable("exercises");
 

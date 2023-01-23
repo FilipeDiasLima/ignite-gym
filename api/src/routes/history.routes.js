@@ -10,6 +10,7 @@ const historyController = new HistoryController();
 historyRoutes.use(ensureAuthenticated);
 
 historyRoutes.get("/", historyController.index);
+historyRoutes.get("/today", historyController.indexToday);
 historyRoutes.post("/", historyController.create);
 
 module.exports = historyRoutes;
