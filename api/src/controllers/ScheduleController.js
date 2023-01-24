@@ -26,6 +26,76 @@ class ScheduleController {
     return response.status(201).json();
   }
 
+  async indexGroups(request, response) {
+    const user_id = request.user.id;
+
+    const sunday = await knex('sunday').select(
+      `sunday.user_id`,
+      `sunday.exercise_id`,
+      `exercises.group`,
+    )
+      .leftJoin("exercises", "exercises.id", "=", `sunday.exercise_id`)
+      .where({ user_id }).groupBy("group").orderBy("group")
+
+    const monday = await knex('monday').select(
+      `monday.user_id`,
+      `monday.exercise_id`,
+      `exercises.group`,
+    )
+      .leftJoin("exercises", "exercises.id", "=", `monday.exercise_id`)
+      .where({ user_id }).groupBy("group").orderBy("group")
+
+    const tuesday = await knex('tuesday').select(
+      `tuesday.user_id`,
+      `tuesday.exercise_id`,
+      `exercises.group`,
+    )
+      .leftJoin("exercises", "exercises.id", "=", `tuesday.exercise_id`)
+      .where({ user_id }).groupBy("group").orderBy("group")
+
+    const wednesday = await knex('wednesday').select(
+      `wednesday.user_id`,
+      `wednesday.exercise_id`,
+      `exercises.group`,
+    )
+      .leftJoin("exercises", "exercises.id", "=", `wednesday.exercise_id`)
+      .where({ user_id }).groupBy("group").orderBy("group")
+
+    const thursday = await knex('thursday').select(
+      `thursday.user_id`,
+      `thursday.exercise_id`,
+      `exercises.group`,
+    )
+      .leftJoin("exercises", "exercises.id", "=", `thursday.exercise_id`)
+      .where({ user_id }).groupBy("group").orderBy("group")
+
+    const friday = await knex('friday').select(
+      `friday.user_id`,
+      `friday.exercise_id`,
+      `exercises.group`,
+    )
+      .leftJoin("exercises", "exercises.id", "=", `friday.exercise_id`)
+      .where({ user_id }).groupBy("group").orderBy("group")
+
+    const saturday = await knex('saturday').select(
+      `saturday.user_id`,
+      `saturday.exercise_id`,
+      `exercises.group`,
+    )
+      .leftJoin("exercises", "exercises.id", "=", `saturday.exercise_id`)
+      .where({ user_id }).groupBy("group").orderBy("group")
+
+    return response.json([
+      sunday.map(item => item.group),
+      monday.map(item => item.group),
+      tuesday.map(item => item.group),
+      wednesday.map(item => item.group),
+      thursday.map(item => item.group),
+      friday.map(item => item.group),
+      saturday.map(item => item.group)
+    ]);
+  }
+
   async indexGroupsByDay(request, response) {
     const { day } = request.params;
     const user_id = request.user.id;
