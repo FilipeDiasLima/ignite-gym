@@ -10,19 +10,18 @@ import { Exercise } from "@screens/Exercise";
 import { History } from "@screens/History";
 import { Home } from "@screens/Home";
 import { Profile } from "@screens/Profile";
-import { Calendar } from "@screens/Calendar";
+import { Schedule } from "@screens/Schedule";
 
-// import CalendarSvg from "@assets/calendar.svg";
 import HomeSvg from "@assets/home.svg";
 import HistorySvg from "@assets/history.svg";
 import ProfileSvg from "@assets/profile.svg";
-import DayCalendar from "@screens/DayCalendar";
+import DaySchedule from "@screens/DaySchedule";
 
 type AppRoutes = {
   home: undefined;
   calendar: undefined;
   exercise: { exerciseId: string };
-  dayCalendar: { day: string };
+  daySchedule: { day: string };
   history: undefined;
   profile: undefined;
 };
@@ -64,7 +63,7 @@ export function AppRoutes() {
       />
       <Screen
         name="calendar"
-        component={Calendar}
+        component={Schedule}
         options={{
           tabBarIcon: ({ color }) => (
             <CalendarSvg color={color} size={iconsSize} />
@@ -95,8 +94,8 @@ export function AppRoutes() {
         options={{ tabBarButton: () => null }}
       />
       <Screen
-        name="dayCalendar"
-        component={DayCalendar}
+        name="daySchedule"
+        component={DaySchedule}
         options={{ tabBarButton: () => null }}
       />
     </Navigator>

@@ -19,15 +19,28 @@ export function DayCard({ nameDay, groups, ...rest }: Props) {
         mb={4}
       >
         <VStack flex={1}>
-          <Heading fontSize="lg" color="white" fontFamily="heading">
+          <Heading
+            textTransform="capitalize"
+            fontSize="lg"
+            color="white"
+            fontFamily="heading"
+          >
             {nameDay}
           </Heading>
 
-          <Text fontSize="sm" color="gray.200" mt={1} numberOfLines={2}>
-            {groups.map(
-              (group, index) =>
-                group + (index === groups.length - 1 ? "" : " - ")
-            )}
+          <Text
+            textTransform="capitalize"
+            fontSize="sm"
+            color="gray.200"
+            mt={1}
+            numberOfLines={2}
+          >
+            {groups.length > 0
+              ? groups.map(
+                  (group, index) =>
+                    group + (index === groups.length - 1 ? "" : " - ")
+                )
+              : "Sem treino"}
           </Text>
         </VStack>
 

@@ -13,7 +13,7 @@ type RouteParams = {
   day: string;
 };
 
-export default function DayCalendar() {
+export default function DaySchedule() {
   const route = useRoute();
   const toast = useToast();
 
