@@ -39,10 +39,6 @@ class HistoryController {
       }
     }
 
-    console.log(days)
-
-    console.log("🚀 ~ file: HistoryController.js:35 ~ HistoryController ~ index ~ days", days)
-
     const exercisesByDay = days.map(day => {
       const exercises = history
         .filter((exercise) => exercise.date === day)
@@ -52,8 +48,6 @@ class HistoryController {
             hour: dayjs(new Date(exercise.created_at)).format('HH:mm')
           }
         });
-
-      console.log("🚀 ~ file: HistoryController.js:52 ~ HistoryController ~ exercisesByDay ~ exercises", exercises)
 
       const exercisesByGroup =
         formattedGroups.map(group => {
@@ -73,15 +67,13 @@ class HistoryController {
   async create(request, response) {
     const { exercise_id } = request.body;
     const user_id = request.user.id;
-    console.log(new Date())
     const date = dayjs(new Date()).format('YYYY-MM-DD')
-    console.log("🚀 ~ file: HistoryController.js:78 ~ HistoryController ~ create ~ date", date)
 
     if (!exercise_id) {
       throw new AppError("Informe o id do exercício.");
     }
 
-    // await knex("history").insert({ user_id, exercise_id, date });
+    await knex("history").insert({ user_id, exercise_id, date });
 
     return response.status(201).json();
   }
