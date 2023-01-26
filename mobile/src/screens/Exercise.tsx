@@ -46,6 +46,11 @@ export function Exercise() {
       setIsLoading(true);
       const { data } = await api.get(`/exercises/${exerciseId}`);
 
+      console.log(
+        "🚀 ~ file: Exercise.tsx:49 ~ fetchExerciseDetails ~ data",
+        data
+      );
+
       setExerciseData(data);
     } catch (error) {
       const isAppError = error instanceof AppError;

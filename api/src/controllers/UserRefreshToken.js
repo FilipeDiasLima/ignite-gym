@@ -7,14 +7,12 @@ const dayjs = require("dayjs");
 class UserRefreshToken {
   async create(request, response) {
     const { token } = request.body;
-    console.log("🚀 ~ file: UserRefreshToken.js:10 ~ UserRefreshToken ~ create ~ token", token)
 
     if (!token) {
       throw new AppError("Informe o token de autenticação.", 401);
     }
 
     const userToken = await knex("users_tokens").where({ token }).first();
-    console.log(userToken)
 
     if (!userToken) {
       throw new AppError("Refresh token não encontrado para este usuário.", 404);

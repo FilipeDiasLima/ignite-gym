@@ -3,7 +3,7 @@ import { ExerciseCard } from "@components/ExerciseCard";
 import { GroupsHorizontalList } from "@components/GroupsHorizontalList";
 import { HomeHeader } from "@components/HomeHeader";
 import { Loading } from "@components/Loading";
-import { ExerciseDTO } from "@dtos/ExerciseDTO";
+import { ExerciseDTO, ScheduleExerciseDTO } from "@dtos/ExerciseDTO";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { api } from "@services/api";
@@ -23,19 +23,19 @@ import { useCallback, useEffect, useState } from "react";
 
 export function Home() {
   const toast = useToast();
-  const day = getDayName();
+  const { dayEN, dayPT } = getDayName();
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   const [groups, setGroups] = useState<string[]>([]);
-  const [exercises, setExercises] = useState<ExerciseDTO[]>([]);
-  const [groupSelected, setGroupSelected] = useState("antebraço");
+  const [exercises, setExercises] = useState<ScheduleExerciseDTO[]>([]);
+  const [groupSelected, setGroupSelected] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   async function fetchGroups() {
     try {
-      const response = await api.get("/groups");
-      // setGroups(response.data);
-      setGroups(["costas", "bíceps", "antebraço"]);
+      setIsLoading(true);
+      const response = await api.get(`/schedule/groups/${dayEN.toLowerCase()}`);
+      setGroups(response.data);
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError
@@ -46,13 +46,17 @@ export function Home() {
         placement: "top",
         bgColor: "red.500",
       });
+    } finally {
+      setIsLoading(false);
     }
   }
 
   async function fetchExercisesByGroup() {
     try {
       setIsLoading(true);
-      const response = await api.get(`/exercises/bygroup/${groupSelected}`);
+      const response = await api.get(
+        `/schedule/exercises/${dayEN.toLowerCase()}/bygroup/${groupSelected}`
+      );
       setExercises(response.data);
     } catch (error) {
       const isAppError = error instanceof AppError;
@@ -73,14 +77,19 @@ export function Home() {
     navigation.navigate("exercise", { exerciseId });
   }
 
+  console.log(exercises);
+
   useEffect(() => {
     fetchGroups();
-    setExercises(calendar.calendar.seg.exercices);
   }, []);
+
+  useEffect(() => {
+    groups.length > 0 && setGroupSelected(groups[0]);
+  }, [groups]);
 
   useFocusEffect(
     useCallback(() => {
-      fetchExercisesByGroup();
+      groups.length > 0 && fetchExercisesByGroup();
     }, [groupSelected])
   );
 
@@ -101,14 +110,14 @@ export function Home() {
           fontSize="md"
           fontFamily="heading"
         >
-          {day}
+          {dayPT}
         </Heading>
         <Text color="gray.200" fontSize="md" fontFamily="heading">
           Treino de hoje
         </Text>
       </HStack>
 
-      {exercises ? (
+      {groups.length > 0 ? (
         <>
           <GroupsHorizontalList
             groupSelected={groupSelected}
@@ -133,11 +142,11 @@ export function Home() {
                 data={exercises}
                 showsVerticalScrollIndicator={false}
                 _contentContainerStyle={{ paddingBottom: 20 }}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item.exercise_id}
                 renderItem={({ item }) => (
                   <ExerciseCard
                     data={item}
-                    onPress={() => handleOpenExerciseDetails(item.id)}
+                    onPress={() => handleOpenExerciseDetails(item.exercise_id)}
                   />
                 )}
               />
