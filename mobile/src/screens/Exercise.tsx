@@ -2,30 +2,28 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import {
   Box,
-  Heading,
   HStack,
-  Icon,
   Image,
   ScrollView,
   Text,
   useToast,
   VStack,
 } from "native-base";
-import { TouchableOpacity } from "react-native";
 
 import BodySvg from "@assets/body.svg";
 import RepetitionsSvg from "@assets/repetitions.svg";
 import SeriesSvg from "@assets/series.svg";
 import { Button } from "@components/Button";
+import { GoBackHeader } from "@components/GoBackHeader";
 import { Loading } from "@components/Loading";
 import { ExerciseDTO } from "@dtos/ExerciseDTO";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
 import { useEffect, useState } from "react";
-import { GoBackHeader } from "@components/GoBackHeader";
 
 type RouteParams = {
   exerciseId: string;
+  dayEN: string;
 };
 
 export function Exercise() {
@@ -39,16 +37,13 @@ export function Exercise() {
   const route = useRoute();
   const toast = useToast();
 
-  const { exerciseId } = route.params as RouteParams;
+  const { exerciseId, dayEN } = route.params as RouteParams;
 
   async function fetchExerciseDetails() {
     try {
       setIsLoading(true);
-      const { data } = await api.get(`/exercises/${exerciseId}`);
-
-      console.log(
-        "🚀 ~ file: Exercise.tsx:49 ~ fetchExerciseDetails ~ data",
-        data
+      const { data } = await api.get(
+        `/schedule/exercise/${dayEN}/${exerciseId}`
       );
 
       setExerciseData(data);
@@ -77,7 +72,6 @@ export function Exercise() {
         placement: "top",
         bgColor: "green.700",
       });
-      navigation.navigate("history");
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError
@@ -108,48 +102,56 @@ export function Exercise() {
         <Loading />
       ) : (
         <ScrollView>
-          <VStack p={8}>
-            <Box rounded="lg" mb={3} overflow="hidden">
-              <Image
-                w="full"
-                h={80}
-                source={{
-                  uri: `${api.defaults.baseURL}/exercise/demo/${exerciseData.demo}`,
-                }}
-                alt="exercicio"
-                resizeMode="cover"
-                rounded="lg"
-              />
-            </Box>
+          {exerciseData.id && (
+            <VStack p={8}>
+              <Box rounded="lg" mb={3} overflow="hidden">
+                <Image
+                  w="full"
+                  h={80}
+                  source={{
+                    uri: `${api.defaults.baseURL}/exercise/demo/${exerciseData.demo}`,
+                  }}
+                  alt="exercicio"
+                  resizeMode="cover"
+                  rounded="lg"
+                />
+              </Box>
 
-            <Box bg="gray.600" rounded="md" pb={4} px={4}>
-              <HStack
-                alignItems="center"
-                justifyContent="space-around"
-                mb={6}
-                mt={5}
-              >
-                <HStack>
-                  <SeriesSvg />
-                  <Text color="gray.200" ml="2">
-                    {exerciseData.series} séries
-                  </Text>
+              <Box bg="gray.600" rounded="md" pb={4} px={4}>
+                <HStack
+                  alignItems="center"
+                  justifyContent="space-around"
+                  mb={6}
+                  mt={5}
+                >
+                  <HStack>
+                    <SeriesSvg />
+                    <Text textTransform="capitalize" color="gray.200" ml="2">
+                      {exerciseData.series}
+                    </Text>
+                    <Text color="gray.200" ml="1">
+                      séries
+                    </Text>
+                  </HStack>
+                  <HStack>
+                    <RepetitionsSvg />
+                    <Text textTransform="capitalize" color="gray.200" ml="2">
+                      {exerciseData.repetitions}
+                    </Text>
+                    <Text color="gray.200" ml="1">
+                      repetições
+                    </Text>
+                  </HStack>
                 </HStack>
-                <HStack>
-                  <RepetitionsSvg />
-                  <Text color="gray.200" ml="2">
-                    {exerciseData.repetitions} repetições
-                  </Text>
-                </HStack>
-              </HStack>
 
-              <Button
-                isLoading={sendingRegister}
-                onPress={handleExerciseHistoryRegister}
-                title="Marcar como realizado"
-              />
-            </Box>
-          </VStack>
+                <Button
+                  isLoading={sendingRegister}
+                  onPress={handleExerciseHistoryRegister}
+                  title="Marcar como realizado"
+                />
+              </Box>
+            </VStack>
+          )}
         </ScrollView>
       )}
     </VStack>

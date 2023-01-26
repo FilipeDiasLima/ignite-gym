@@ -20,8 +20,8 @@ import DaySchedule from "@screens/DaySchedule";
 type AppRoutes = {
   home: undefined;
   calendar: undefined;
-  exercise: { exerciseId: string };
-  daySchedule: { day: string };
+  exercise: { exerciseId: string; dayEN: string };
+  daySchedule: { dayPT: string; dayEN: string };
   history: undefined;
   profile: undefined;
 };

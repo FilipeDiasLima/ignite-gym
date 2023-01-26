@@ -1,11 +1,11 @@
 import { Heading, HStack, Image, Text, VStack, Icon } from "native-base";
 import { TouchableOpacity, TouchableOpacityProps } from "react-native";
 import { Entypo } from "@expo/vector-icons";
-import { ScheduleExerciseDTO } from "@dtos/ExerciseDTO";
+import { ExerciseDTO } from "@dtos/ExerciseDTO";
 import { api } from "@services/api";
 
 type Props = TouchableOpacityProps & {
-  data: ScheduleExerciseDTO;
+  data: ExerciseDTO;
 };
 
 export function ExerciseCard({ data, ...rest }: Props) {

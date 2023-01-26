@@ -4,6 +4,7 @@ const AppError = require("../utils/AppError");
 class ScheduleController {
   async create(request, response) {
     const { day, repetitions, series, exercise_id } = request.body
+    console.log("🚀 ~ file: ScheduleController.js:7 ~ ScheduleController ~ create ~ day, repetitions, series, exercise_id", day, repetitions, series, exercise_id)
     const user_id = request.user.id;
 
     if (!day || !repetitions || !series) {
@@ -19,8 +20,8 @@ class ScheduleController {
     await knex(day).insert({
       user_id,
       exercise_id,
-      series,
-      repetitions
+      series: series === '--' ? 'até falhar' : series,
+      repetitions: repetitions === '--' ? 'até falhar' : repetitions
     });
 
     return response.status(201).json();
@@ -31,7 +32,7 @@ class ScheduleController {
 
     const sunday = await knex('sunday').select(
       `sunday.user_id`,
-      `sunday.exercise_id`,
+      `sunday.exercise_id as id`,
       `exercises.group`,
     )
       .leftJoin("exercises", "exercises.id", "=", `sunday.exercise_id`)
@@ -39,7 +40,7 @@ class ScheduleController {
 
     const monday = await knex('monday').select(
       `monday.user_id`,
-      `monday.exercise_id`,
+      `monday.exercise_id as id`,
       `exercises.group`,
     )
       .leftJoin("exercises", "exercises.id", "=", `monday.exercise_id`)
@@ -47,7 +48,7 @@ class ScheduleController {
 
     const tuesday = await knex('tuesday').select(
       `tuesday.user_id`,
-      `tuesday.exercise_id`,
+      `tuesday.exercise_id as id`,
       `exercises.group`,
     )
       .leftJoin("exercises", "exercises.id", "=", `tuesday.exercise_id`)
@@ -55,7 +56,7 @@ class ScheduleController {
 
     const wednesday = await knex('wednesday').select(
       `wednesday.user_id`,
-      `wednesday.exercise_id`,
+      `wednesday.exercise_id as id`,
       `exercises.group`,
     )
       .leftJoin("exercises", "exercises.id", "=", `wednesday.exercise_id`)
@@ -63,7 +64,7 @@ class ScheduleController {
 
     const thursday = await knex('thursday').select(
       `thursday.user_id`,
-      `thursday.exercise_id`,
+      `thursday.exercise_id as id`,
       `exercises.group`,
     )
       .leftJoin("exercises", "exercises.id", "=", `thursday.exercise_id`)
@@ -71,7 +72,7 @@ class ScheduleController {
 
     const friday = await knex('friday').select(
       `friday.user_id`,
-      `friday.exercise_id`,
+      `friday.exercise_id as id`,
       `exercises.group`,
     )
       .leftJoin("exercises", "exercises.id", "=", `friday.exercise_id`)
@@ -79,7 +80,7 @@ class ScheduleController {
 
     const saturday = await knex('saturday').select(
       `saturday.user_id`,
-      `saturday.exercise_id`,
+      `saturday.exercise_id as id`,
       `exercises.group`,
     )
       .leftJoin("exercises", "exercises.id", "=", `saturday.exercise_id`)
@@ -102,7 +103,7 @@ class ScheduleController {
 
     const groups = await knex(day).select(
       `${day}.user_id`,
-      `${day}.exercise_id`,
+      `${day}.exercise_id as id`,
       `exercises.group`,
     )
       .leftJoin("exercises", "exercises.id", "=", `${day}.exercise_id`)
@@ -119,7 +120,7 @@ class ScheduleController {
 
     const exercises = await knex(day).select(
       `${day}.user_id`,
-      `${day}.exercise_id`,
+      `${day}.exercise_id as id`,
       `${day}.series`,
       `${day}.repetitions`,
       `exercises.name`,
@@ -131,6 +132,26 @@ class ScheduleController {
       .where({ user_id, group }).orderBy("name")
 
     return response.json(exercises);
+  }
+
+  async showExerciseDay(request, response) {
+    const { day, exerciseId } = request.params
+    const user_id = request.user.id;
+
+    const exercise = await knex(day).select(
+      `${day}.user_id`,
+      `${day}.exercise_id as id`,
+      `${day}.series`,
+      `${day}.repetitions`,
+      `exercises.name`,
+      `exercises.group`,
+      `exercises.demo`,
+      `exercises.thumb`,
+    )
+      .leftJoin("exercises", "exercises.id", "=", `${day}.exercise_id`)
+      .where({ user_id, exercise_id: exerciseId })
+
+    return response.status(201).json(exercise[0]);
   }
 
   async update(request, response) {

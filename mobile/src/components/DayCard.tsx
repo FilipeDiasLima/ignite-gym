@@ -35,7 +35,7 @@ export function DayCard({ nameDay, groups, ...rest }: Props) {
             mt={1}
             numberOfLines={2}
           >
-            {groups.length > 0
+            {groups && groups.length > 0
               ? groups.map(
                   (group, index) =>
                     group + (index === groups.length - 1 ? "" : " - ")

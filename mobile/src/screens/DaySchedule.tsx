@@ -6,11 +6,21 @@ import { ExerciseDTO } from "@dtos/ExerciseDTO";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
-import { FlatList, Heading, HStack, Text, useToast, VStack } from "native-base";
+import {
+  Center,
+  FlatList,
+  Heading,
+  HStack,
+  ScrollView,
+  Text,
+  useToast,
+  VStack,
+} from "native-base";
 import { useCallback, useEffect, useState } from "react";
 
 type RouteParams = {
-  day: string;
+  dayPT: string;
+  dayEN: string;
 };
 
 export default function DaySchedule() {
@@ -18,13 +28,36 @@ export default function DaySchedule() {
   const toast = useToast();
 
   const [exercises, setExercises] = useState<ExerciseDTO[]>([]);
+  const [userExercises, setUserExercises] = useState<ExerciseDTO[]>([]);
   const [groupSelected, setGroupSelected] = useState("antebraço");
   const [groups, setGroups] = useState<string[]>([]);
   const groupsSelected = ["Costas", "Bíceps", "Antebraço"];
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const { day } = route.params as RouteParams;
+  const { dayEN, dayPT } = route.params as RouteParams;
+
+  async function fetchUserExercisesByGroup() {
+    try {
+      setIsLoading(true);
+      const response = await api.get(
+        `/schedule/exercises/${dayEN.toLowerCase()}/bygroup/${groupSelected}`
+      );
+      setUserExercises(response.data);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível carregar os exercícios";
+      toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.500",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   async function fetchGroups() {
     try {
@@ -63,6 +96,20 @@ export default function DaySchedule() {
     }
   }
 
+  function removeDuplicates() {
+    const found = exercises.map((exercise) => {
+      const filter = userExercises.map((ex) => {
+        if (ex.id === exercise.id) return ex.id;
+      });
+      return filter[0] !== undefined && filter[0];
+    });
+    const parse = found.filter((item) => item);
+    const exercisesAux = exercises.filter((exercise) => {
+      if (!parse.includes(exercise.id)) return exercise;
+    });
+    setExercises(exercisesAux);
+  }
+
   useEffect(() => {
     fetchGroups();
   }, []);
@@ -70,12 +117,17 @@ export default function DaySchedule() {
   useFocusEffect(
     useCallback(() => {
       fetchExercisesByGroup();
-    }, [groupSelected])
+      fetchUserExercisesByGroup();
+    }, [groupSelected, dayPT])
   );
+
+  useEffect(() => {
+    removeDuplicates();
+  }, [userExercises]);
 
   return (
     <VStack flex={1}>
-      <GoBackHeader title={`Treino de `} titleSec={day} />
+      <GoBackHeader title={`Treino de `} titleSec={dayPT} />
 
       <Text mt={5} mb={-5} px={8} color="gray.200" fontSize="md">
         {groupsSelected.map(
@@ -90,31 +142,57 @@ export default function DaySchedule() {
         groups={groups}
       />
 
-      {isLoading ? (
-        <Loading />
-      ) : (
-        <>
-          <HStack justifyContent="space-between" px={8} mb={5}>
-            <Heading color="gray.200" fontSize="md" fontFamily="heading">
-              Exercícios selecionados
-            </Heading>
-            <Text color="gray.200" fontSize="sm">
-              2
-            </Text>
-          </HStack>
+      <ScrollView>
+        <VStack px={8}>
+          {isLoading ? (
+            <Loading />
+          ) : (
+            <>
+              {userExercises && userExercises.length > 0 && (
+                <>
+                  <HStack justifyContent="space-between" mb={5}>
+                    <Heading
+                      color="gray.200"
+                      fontSize="md"
+                      fontFamily="heading"
+                    >
+                      Exercícios selecionados
+                    </Heading>
+                    <Text color="gray.200" fontSize="sm">
+                      {userExercises.length}
+                    </Text>
+                  </HStack>
 
-          <FlatList
-            data={exercises}
-            showsVerticalScrollIndicator={false}
-            px={8}
-            _contentContainerStyle={{
-              paddingBottom: 20,
-            }}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => <ExerciseAccordion data={item} />}
-          />
-        </>
-      )}
+                  {userExercises.map((exercise) => (
+                    <ExerciseAccordion
+                      key={exercise.id}
+                      data={exercise}
+                      day={dayEN}
+                    />
+                  ))}
+                </>
+              )}
+
+              <HStack justifyContent="space-between" my={5}>
+                <Heading color="gray.200" fontSize="md" fontFamily="heading">
+                  Exercícios disponíveis
+                </Heading>
+                <Text color="gray.200" fontSize="sm">
+                  {exercises.length}
+                </Text>
+              </HStack>
+
+              {exercises.map((exercise) => (
+                <ExerciseAccordion
+                  key={exercise.id}
+                  data={exercise}
+                  day={dayEN}
+                />
+              ))}
+            </>
+          )}
+        </VStack>
+      </ScrollView>
     </VStack>
   );
 }

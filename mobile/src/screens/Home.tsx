@@ -3,7 +3,7 @@ import { ExerciseCard } from "@components/ExerciseCard";
 import { GroupsHorizontalList } from "@components/GroupsHorizontalList";
 import { HomeHeader } from "@components/HomeHeader";
 import { Loading } from "@components/Loading";
-import { ExerciseDTO, ScheduleExerciseDTO } from "@dtos/ExerciseDTO";
+import { ExerciseDTO } from "@dtos/ExerciseDTO";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { api } from "@services/api";
@@ -27,7 +27,7 @@ export function Home() {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   const [groups, setGroups] = useState<string[]>([]);
-  const [exercises, setExercises] = useState<ScheduleExerciseDTO[]>([]);
+  const [exercises, setExercises] = useState<ExerciseDTO[]>([]);
   const [groupSelected, setGroupSelected] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -74,14 +74,14 @@ export function Home() {
   }
 
   function handleOpenExerciseDetails(exerciseId: string) {
-    navigation.navigate("exercise", { exerciseId });
+    navigation.navigate("exercise", { exerciseId, dayEN: dayEN.toLowerCase() });
   }
 
-  console.log(exercises);
-
-  useEffect(() => {
-    fetchGroups();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchGroups();
+    }, [])
+  );
 
   useEffect(() => {
     groups.length > 0 && setGroupSelected(groups[0]);
@@ -142,11 +142,11 @@ export function Home() {
                 data={exercises}
                 showsVerticalScrollIndicator={false}
                 _contentContainerStyle={{ paddingBottom: 20 }}
-                keyExtractor={(item) => item.exercise_id}
+                keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                   <ExerciseCard
                     data={item}
-                    onPress={() => handleOpenExerciseDetails(item.exercise_id)}
+                    onPress={() => handleOpenExerciseDetails(item.id)}
                   />
                 )}
               />

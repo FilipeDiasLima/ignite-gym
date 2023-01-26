@@ -11,25 +11,74 @@ import {
   VStack,
   Switch,
   Input,
+  useToast,
 } from "native-base";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./Button";
 import { List } from "react-native-paper";
+import { AppError } from "@utils/AppError";
 
 type Props = {
   data: ExerciseDTO;
+  day: string;
 };
 
-export function ExerciseAccordion({ data }: Props) {
-  const { Accordion, Item } = List;
-
+export function ExerciseAccordion({ data, day }: Props) {
+  const toast = useToast();
+  const { Accordion } = List;
   const [isOpen, setIsOpen] = useState(false);
-  const [isToFailureSeries, setIsToFailureSeries] = useState(false);
-  const [isToFailureRepetitions, setIsToFailureRepetitions] = useState(false);
+  const [seriesValue, setSeriesValue] = useState(
+    data.series !== "até falhar" ? data.series : ""
+  );
+  const [repetitionValue, setRepetitionValue] = useState(
+    data.repetitions !== "até falhar" ? data.repetitions : ""
+  );
+  const [isToFailureSeries, setIsToFailureSeries] = useState(
+    data.series === "até falhar" || false
+  );
+  const [isToFailureRepetitions, setIsToFailureRepetitions] = useState(
+    data.repetitions === "até falhar" || false
+  );
+  const [sendingRegister, setSendingRegister] = useState(false);
+
+  async function handleSaveExercise() {
+    try {
+      setSendingRegister(true);
+
+      await api.post(`/schedule`, {
+        day: day.toLowerCase(),
+        exercise_id: data.id,
+        series: seriesValue,
+        repetitions: repetitionValue,
+      });
+      toast.show({
+        title: "Exercício adicionado",
+        placement: "top",
+        bgColor: "green.700",
+      });
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível adicionar o exercício";
+      toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.500",
+      });
+    } finally {
+      setSendingRegister(false);
+    }
+  }
 
   function handleAccordion() {
     setIsOpen(!isOpen);
   }
+
+  useEffect(() => {
+    setRepetitionValue(isToFailureRepetitions ? "--" : "");
+    setSeriesValue(isToFailureSeries ? "--" : "");
+  }, [isToFailureRepetitions, isToFailureSeries]);
 
   return (
     <Accordion
@@ -83,6 +132,7 @@ export function ExerciseAccordion({ data }: Props) {
               alignItems="center"
               w={173}
               justifyContent="space-between"
+              overflow="hidden"
             >
               <Text color={isToFailureSeries ? "red.500" : "gray.200"} w="55%">
                 Séries
@@ -94,6 +144,8 @@ export function ExerciseAccordion({ data }: Props) {
                 variant="unstyled"
                 keyboardType="numeric"
                 placeholder={isToFailureSeries ? "--" : "0"}
+                value={isToFailureSeries ? "--" : seriesValue}
+                onChangeText={(e) => setSeriesValue(e)}
               />
             </Box>
             <HStack alignItems="center" space={2}>
@@ -133,6 +185,8 @@ export function ExerciseAccordion({ data }: Props) {
                 variant="unstyled"
                 keyboardType="numeric"
                 placeholder={isToFailureRepetitions ? "--" : "0"}
+                value={isToFailureRepetitions ? "--" : repetitionValue}
+                onChangeText={(e) => setRepetitionValue(e)}
               />
             </Box>
             <HStack alignItems="center" space={2}>
@@ -148,7 +202,12 @@ export function ExerciseAccordion({ data }: Props) {
             </HStack>
           </HStack>
 
-          <Button title="Adicionar" h={10} />
+          <Button
+            onPress={handleSaveExercise}
+            title="Adicionar"
+            h={10}
+            isLoading={sendingRegister}
+          />
         </VStack>
       </>
     </Accordion>

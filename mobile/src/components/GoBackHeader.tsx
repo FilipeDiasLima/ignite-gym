@@ -44,6 +44,7 @@ export function GoBackHeader({
             fontSize="lg"
             flexShrink={1}
             fontFamily="heading"
+            textTransform="capitalize"
           >
             {titleSec}
           </Text>
