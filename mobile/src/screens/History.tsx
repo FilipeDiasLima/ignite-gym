@@ -1,4 +1,5 @@
 import { HistoryCard } from "@components/HistoryCard";
+import { HistoryContainer } from "@components/HistoryContainer";
 import { Loading } from "@components/Loading";
 import { ScreenHeader } from "@components/ScreenHeader";
 import { HistoryByDayDTO } from "@dtos/HistoryByDay";
@@ -9,12 +10,13 @@ import { AppError } from "@utils/AppError";
 import {
   Center,
   Heading,
+  HStack,
   SectionList,
   Text,
   useToast,
   VStack,
 } from "native-base";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 export function History() {
   const toast = useToast();
@@ -59,18 +61,27 @@ export function History() {
         <SectionList
           sections={exercises}
           px={8}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <HistoryCard data={item} />}
+          keyExtractor={(item) => {
+            const name = String(Object.keys(item));
+            return name;
+          }}
+          renderItem={({ item }) => <HistoryContainer data={item} />}
           renderSectionHeader={({ section }) => (
-            <Heading
-              color="gray.200"
-              fontSize="md"
-              mt={10}
-              mb={3}
-              fontFamily="heading"
+            <HStack
+              pt={7}
+              pb={3}
+              justifyContent="space-between"
+              alignItems="center"
+              bg="gray.700"
+              flex={1}
             >
-              {section.title}
-            </Heading>
+              <Heading color="green.500" fontSize="md" fontFamily="heading">
+                {section.title}
+              </Heading>
+              <Text color="white" fontSize="md" textTransform="capitalize">
+                {section.dayName}
+              </Text>
+            </HStack>
           )}
           contentContainerStyle={
             exercises.length === 0 && { flex: 1, justifyContent: "center" }

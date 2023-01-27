@@ -21,7 +21,7 @@ type AppRoutes = {
   home: undefined;
   calendar: undefined;
   exercise: { exerciseId: string; dayEN: string };
-  daySchedule: { dayPT: string; dayEN: string };
+  daySchedule: { dayPT: string; dayEN: string; dayGroups: string[] };
   history: undefined;
   profile: undefined;
 };

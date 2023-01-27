@@ -1,6 +1,11 @@
 import { HistoryDTO } from "./HistoryDTO";
 
+export type HistoryDataProps = {
+  [group: string]: HistoryDTO[];
+};
+
 export type HistoryByDayDTO = {
   title: string;
-  data: HistoryDTO[];
+  dayName: string;
+  data: HistoryDataProps[];
 };

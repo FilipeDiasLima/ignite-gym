@@ -34,8 +34,12 @@ export function Schedule() {
     }
   }
 
-  function handleOpenDay(dayPT: string, dayEN: string) {
-    navigation.navigate("daySchedule", { dayPT, dayEN });
+  function handleOpenDay(dayPT: string, index: number) {
+    navigation.navigate("daySchedule", {
+      dayPT,
+      dayEN: daysEN[index],
+      dayGroups: groups[index],
+    });
   }
 
   useEffect(() => {
@@ -61,7 +65,7 @@ export function Schedule() {
         keyExtractor={(item) => item}
         renderItem={({ item, index }) => (
           <DayCard
-            onPress={() => handleOpenDay(item, daysEN[index])}
+            onPress={() => handleOpenDay(item, index)}
             nameDay={item}
             groups={groups[index]}
           />

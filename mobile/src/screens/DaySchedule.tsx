@@ -21,21 +21,20 @@ import { useCallback, useEffect, useState } from "react";
 type RouteParams = {
   dayPT: string;
   dayEN: string;
+  dayGroups: string[];
 };
 
 export default function DaySchedule() {
   const route = useRoute();
   const toast = useToast();
+  const { dayEN, dayPT, dayGroups } = route.params as RouteParams;
 
   const [exercises, setExercises] = useState<ExerciseDTO[]>([]);
   const [userExercises, setUserExercises] = useState<ExerciseDTO[]>([]);
   const [groupSelected, setGroupSelected] = useState("antebraço");
   const [groups, setGroups] = useState<string[]>([]);
-  const groupsSelected = ["Costas", "Bíceps", "Antebraço"];
 
   const [isLoading, setIsLoading] = useState(false);
-
-  const { dayEN, dayPT } = route.params as RouteParams;
 
   async function fetchUserExercisesByGroup() {
     try {
@@ -129,10 +128,17 @@ export default function DaySchedule() {
     <VStack flex={1}>
       <GoBackHeader title={`Treino de `} titleSec={dayPT} />
 
-      <Text mt={5} mb={-5} px={8} color="gray.200" fontSize="md">
-        {groupsSelected.map(
+      <Text
+        textTransform="capitalize"
+        mt={5}
+        mb={-5}
+        px={8}
+        color="gray.200"
+        fontSize="md"
+      >
+        {dayGroups.map(
           (group, index) =>
-            group + (index === groupsSelected.length - 1 ? "" : " - ")
+            group + (index === dayGroups.length - 1 ? "" : " - ")
         )}
       </Text>
 
