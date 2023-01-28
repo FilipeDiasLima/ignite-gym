@@ -1,6 +1,5 @@
 import { HistoryDataProps } from "@dtos/HistoryByDay";
-import { HistoryDTO } from "@dtos/HistoryDTO";
-import { Heading, View, VStack } from "native-base";
+import { Heading, VStack } from "native-base";
 import { HistoryCard } from "./HistoryCard";
 
 type Props = {

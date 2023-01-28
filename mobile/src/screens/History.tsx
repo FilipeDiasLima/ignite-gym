@@ -1,4 +1,3 @@
-import { HistoryCard } from "@components/HistoryCard";
 import { HistoryContainer } from "@components/HistoryContainer";
 import { Loading } from "@components/Loading";
 import { ScreenHeader } from "@components/ScreenHeader";

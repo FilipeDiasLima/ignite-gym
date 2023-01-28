@@ -31,12 +31,17 @@ export function ExerciseCard({ data, ...rest }: Props) {
           resizeMode="cover"
         />
 
-        <VStack flex={1}>
-          <Heading fontSize="lg" color="white" fontFamily="heading">
+        <VStack flex={0.98}>
+          <Heading
+            fontSize="lg"
+            color="white"
+            fontFamily="heading"
+            numberOfLines={1}
+          >
             {data.name}
           </Heading>
 
-          <Text fontSize="sm" color="gray.200" mt={1} numberOfLines={2}>
+          <Text fontSize="sm" color="gray.200" mt={1} numberOfLines={1}>
             {data.series} séries x {data.repetitions} repetições
           </Text>
         </VStack>

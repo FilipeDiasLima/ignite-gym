@@ -2,29 +2,46 @@ import { ExerciseDTO } from "@dtos/ExerciseDTO";
 import { api } from "@services/api";
 import {
   Box,
+  Button as NativeBase,
   Divider,
   Heading,
   HStack,
   Image,
-  Text,
-  View,
-  VStack,
-  Switch,
   Input,
-  useToast,
+  Switch,
+  Text,
+  VStack,
 } from "native-base";
 import { useEffect, useState } from "react";
-import { Button } from "./Button";
 import { List } from "react-native-paper";
-import { AppError } from "@utils/AppError";
+import { Button } from "./Button";
 
 type Props = {
   data: ExerciseDTO;
   day: string;
+  selected?: boolean;
+  isLoading: boolean;
+  updateExercise: (
+    exercise_id: string,
+    series: string,
+    repetitions: string
+  ) => void;
+  removeExercise: (exercise_id: string) => void;
+  addExercise: (
+    exercise_id: string,
+    series: string,
+    repetitions: string
+  ) => void;
 };
 
-export function ExerciseAccordion({ data, day }: Props) {
-  const toast = useToast();
+export function ExerciseAccordion({
+  data,
+  selected = false,
+  isLoading,
+  addExercise,
+  removeExercise,
+  updateExercise,
+}: Props) {
   const { Accordion } = List;
   const [isOpen, setIsOpen] = useState(false);
   const [seriesValue, setSeriesValue] = useState(
@@ -39,46 +56,18 @@ export function ExerciseAccordion({ data, day }: Props) {
   const [isToFailureRepetitions, setIsToFailureRepetitions] = useState(
     data.repetitions === "até falhar" || false
   );
-  const [sendingRegister, setSendingRegister] = useState(false);
-
-  async function handleSaveExercise() {
-    try {
-      setSendingRegister(true);
-
-      await api.post(`/schedule`, {
-        day: day.toLowerCase(),
-        exercise_id: data.id,
-        series: seriesValue,
-        repetitions: repetitionValue,
-      });
-      toast.show({
-        title: "Exercício adicionado",
-        placement: "top",
-        bgColor: "green.700",
-      });
-    } catch (error) {
-      const isAppError = error instanceof AppError;
-      const title = isAppError
-        ? error.message
-        : "Não foi possível adicionar o exercício";
-      toast.show({
-        title,
-        placement: "top",
-        bgColor: "red.500",
-      });
-    } finally {
-      setSendingRegister(false);
-    }
-  }
 
   function handleAccordion() {
     setIsOpen(!isOpen);
   }
 
   useEffect(() => {
-    setRepetitionValue(isToFailureRepetitions ? "--" : "");
-    setSeriesValue(isToFailureSeries ? "--" : "");
-  }, [isToFailureRepetitions, isToFailureSeries]);
+    setRepetitionValue(isToFailureRepetitions ? "--" : repetitionValue);
+  }, [isToFailureRepetitions]);
+
+  useEffect(() => {
+    setSeriesValue(isToFailureSeries ? "--" : seriesValue);
+  }, [isToFailureSeries]);
 
   return (
     <Accordion
@@ -144,7 +133,7 @@ export function ExerciseAccordion({ data, day }: Props) {
                 variant="unstyled"
                 keyboardType="numeric"
                 placeholder={isToFailureSeries ? "--" : "0"}
-                value={isToFailureSeries ? "--" : seriesValue}
+                value={seriesValue}
                 onChangeText={(e) => setSeriesValue(e)}
               />
             </Box>
@@ -202,12 +191,44 @@ export function ExerciseAccordion({ data, day }: Props) {
             </HStack>
           </HStack>
 
-          <Button
-            onPress={handleSaveExercise}
-            title="Adicionar"
-            h={10}
-            isLoading={sendingRegister}
-          />
+          {selected ? (
+            <HStack mt={2} justifyContent="space-between">
+              <NativeBase
+                _pressed={{
+                  bg: "transparent",
+                }}
+                _text={{
+                  color: "red.500",
+                }}
+                isLoading={isLoading}
+                w="46%"
+                variant="ghost"
+                onPress={() => removeExercise(data.id)}
+              >
+                Remover
+              </NativeBase>
+              <NativeBase
+                isLoading={isLoading}
+                onPress={() =>
+                  updateExercise(data.id, seriesValue, repetitionValue)
+                }
+                w="46%"
+                bg="green.700"
+                _pressed={{
+                  bg: "green.500",
+                }}
+              >
+                Salvar
+              </NativeBase>
+            </HStack>
+          ) : (
+            <Button
+              onPress={() => addExercise(data.id, seriesValue, repetitionValue)}
+              title="Adicionar"
+              h={10}
+              isLoading={isLoading}
+            />
+          )}
         </VStack>
       </>
     </Accordion>

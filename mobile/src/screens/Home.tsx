@@ -8,7 +8,6 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
-import { calendar } from "@utils/calendar";
 import { getDayName } from "@utils/getDayName";
 import {
   Center,
@@ -28,7 +27,7 @@ export function Home() {
 
   const [groups, setGroups] = useState<string[]>([]);
   const [exercises, setExercises] = useState<ExerciseDTO[]>([]);
-  const [groupSelected, setGroupSelected] = useState("");
+  const [groupSelected, setGroupSelected] = useState(groups[0] || "");
   const [isLoading, setIsLoading] = useState(true);
 
   async function fetchGroups() {

@@ -7,8 +7,6 @@ import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
 import {
-  Center,
-  FlatList,
   Heading,
   HStack,
   ScrollView,
@@ -33,7 +31,6 @@ export default function DaySchedule() {
   const [userExercises, setUserExercises] = useState<ExerciseDTO[]>([]);
   const [groupSelected, setGroupSelected] = useState("antebraço");
   const [groups, setGroups] = useState<string[]>([]);
-
   const [isLoading, setIsLoading] = useState(false);
 
   async function fetchUserExercisesByGroup() {
@@ -85,6 +82,107 @@ export default function DaySchedule() {
       const title = isAppError
         ? error.message
         : "Não foi possível carregar os exercícios";
+      toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.500",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleAddExercise(
+    exercise_id: string,
+    series: string,
+    repetitions: string
+  ) {
+    try {
+      setIsLoading(true);
+
+      await api.post(`/schedule`, {
+        day: dayEN.toLowerCase(),
+        exercise_id,
+        series,
+        repetitions,
+      });
+      toast.show({
+        title: "Exercício adicionado",
+        placement: "top",
+        bgColor: "green.700",
+      });
+      fetchExercisesByGroup();
+      fetchUserExercisesByGroup();
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível adicionar o exercício";
+      toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.500",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleRemoveExercise(exercise_id: string) {
+    try {
+      setIsLoading(true);
+
+      await api.delete(
+        `/schedule/exercise/${dayEN.toLowerCase()}/${exercise_id}`
+      );
+      toast.show({
+        title: "Exercício removido",
+        placement: "top",
+        bgColor: "green.700",
+      });
+      fetchExercisesByGroup();
+      fetchUserExercisesByGroup();
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível adicionar o exercício";
+      toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.500",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleUpdateExercise(
+    exercise_id: string,
+    series: string,
+    repetitions: string
+  ) {
+    try {
+      setIsLoading(true);
+
+      await api.put(`/schedule`, {
+        day: dayEN.toLowerCase(),
+        exercise_id,
+        series,
+        repetitions,
+      });
+      toast.show({
+        title: "Exercício atualizado",
+        placement: "top",
+        bgColor: "green.700",
+      });
+      fetchExercisesByGroup();
+      fetchUserExercisesByGroup();
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : "Não foi possível adicionar o exercício";
       toast.show({
         title,
         placement: "top",
@@ -174,6 +272,11 @@ export default function DaySchedule() {
                       key={exercise.id}
                       data={exercise}
                       day={dayEN}
+                      selected
+                      isLoading={isLoading}
+                      addExercise={handleAddExercise}
+                      updateExercise={handleUpdateExercise}
+                      removeExercise={handleRemoveExercise}
                     />
                   ))}
                 </>
@@ -193,6 +296,10 @@ export default function DaySchedule() {
                   key={exercise.id}
                   data={exercise}
                   day={dayEN}
+                  isLoading={isLoading}
+                  addExercise={handleAddExercise}
+                  updateExercise={handleUpdateExercise}
+                  removeExercise={handleRemoveExercise}
                 />
               ))}
             </>
