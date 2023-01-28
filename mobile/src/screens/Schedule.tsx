@@ -1,5 +1,6 @@
 import { DayCard } from "@components/DayCard";
 import { HomeHeader } from "@components/HomeHeader";
+import { useAuth } from "@hooks/useAuth";
 import { useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { api } from "@services/api";
@@ -10,6 +11,8 @@ import { useEffect, useState } from "react";
 
 export function Schedule() {
   const toast = useToast();
+  const { isReloadSchedule, handleChangeReloadSchedule } = useAuth();
+
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const [isLoading, setIsLoading] = useState(true);
   const [groups, setGroups] = useState<[string[]]>([[]]);
@@ -19,6 +22,7 @@ export function Schedule() {
       setIsLoading(true);
       const response = await api.get(`/schedule/groups`);
       setGroups(response.data);
+      handleChangeReloadSchedule(false);
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError
@@ -44,7 +48,8 @@ export function Schedule() {
 
   useEffect(() => {
     fetchGroups();
-  }, []);
+    isReloadSchedule && fetchGroups();
+  }, [, isReloadSchedule]);
 
   return (
     <VStack flex={1}>

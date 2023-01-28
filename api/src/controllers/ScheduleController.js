@@ -4,7 +4,7 @@ const AppError = require("../utils/AppError");
 class ScheduleController {
   async create(request, response) {
     const { day, repetitions, series, exercise_id } = request.body
-    console.log("🚀 ~ file: ScheduleController.js:7 ~ ScheduleController ~ create ~ day, repetitions, series, exercise_id", day, repetitions, series, exercise_id)
+
     const user_id = request.user.id;
 
     if (!day || !repetitions || !series) {

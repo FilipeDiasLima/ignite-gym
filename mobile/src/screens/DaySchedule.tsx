@@ -3,6 +3,7 @@ import { GoBackHeader } from "@components/GoBackHeader";
 import { GroupsHorizontalList } from "@components/GroupsHorizontalList";
 import { Loading } from "@components/Loading";
 import { ExerciseDTO } from "@dtos/ExerciseDTO";
+import { useAuth } from "@hooks/useAuth";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
@@ -26,6 +27,7 @@ export default function DaySchedule() {
   const route = useRoute();
   const toast = useToast();
   const { dayEN, dayPT, dayGroups } = route.params as RouteParams;
+  const { isReloadSchedule, handleChangeReloadSchedule } = useAuth();
 
   const [exercises, setExercises] = useState<ExerciseDTO[]>([]);
   const [userExercises, setUserExercises] = useState<ExerciseDTO[]>([]);
@@ -113,6 +115,7 @@ export default function DaySchedule() {
       });
       fetchExercisesByGroup();
       fetchUserExercisesByGroup();
+      handleChangeReloadSchedule(true);
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError
@@ -142,6 +145,7 @@ export default function DaySchedule() {
       });
       fetchExercisesByGroup();
       fetchUserExercisesByGroup();
+      handleChangeReloadSchedule(true);
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError
@@ -178,6 +182,7 @@ export default function DaySchedule() {
       });
       fetchExercisesByGroup();
       fetchUserExercisesByGroup();
+      handleChangeReloadSchedule(true);
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError

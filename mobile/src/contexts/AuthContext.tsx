@@ -19,10 +19,12 @@ type AuthContextProviderProps = {
 export type AuthContextDataProps = {
   user: UserDTO;
   isLoadingStorage: boolean;
+  isReloadSchedule: boolean;
   signIn(email: string, password: string): Promise<void>;
   signOut(): void;
   updateProfile(data: UserDTO): Promise<void>;
   refeshedToken: string;
+  handleChangeReloadSchedule(value: boolean): void;
 };
 
 export const AuthContext = createContext<AuthContextDataProps>(
@@ -33,6 +35,11 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const [user, setUser] = useState<UserDTO>({} as UserDTO);
   const [isLoadingStorage, setIsLoadingStorage] = useState(true);
   const [refeshedToken, setRefreshedToken] = useState("");
+  const [isReloadSchedule, setIsReloadSchedule] = useState(false);
+
+  function handleChangeReloadSchedule(value: boolean) {
+    setIsReloadSchedule(value);
+  }
 
   async function userAndTokenUpdate(userData: UserDTO, token: string) {
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -117,9 +124,11 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
         user,
         isLoadingStorage,
         refeshedToken,
+        isReloadSchedule,
         signIn,
         signOut,
         updateProfile,
+        handleChangeReloadSchedule,
       }}
     >
       {children}

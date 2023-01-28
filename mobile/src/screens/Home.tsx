@@ -156,11 +156,11 @@ export function Home() {
         <>
           <Center flex={1} px={10}>
             <Text textAlign="center" color="gray.200" fontSize="lg">
-              Você ainda não possui um treino,{" "}
+              Você ainda não possui um treino para hoje,{" "}
               <Text color="green.500" fontSize="lg">
                 acesse a agenda
               </Text>{" "}
-              patra criar seu treino
+              para criar seu treino
             </Text>
           </Center>
           <ArrowDownSvg
