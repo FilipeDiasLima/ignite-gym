@@ -3,7 +3,8 @@
 </h1>
 
 <h5 align="center">Seu app para treinar na academia, programe seu treino da semana da melhor forma possível.</h5>
-
+<h6 align="center">Caso queira ver um vídeo do app rodando, acesse o link abaixo e deixa a curtida se puder, obg:</h6>
+<h6 align="center"><a href="https://www.linkedin.com/posts/filipediaslima_react-reactnative-rocketseat-activity-7025477756087844864--e0_?utm_source=share&utm_medium=member_desktop">IgniteGym App</a></h6>
 <br/>
 
 <h2 align="center">
